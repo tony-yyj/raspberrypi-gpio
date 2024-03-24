@@ -3,16 +3,15 @@ from time import sleep
 
 GPIO.setmode(GPIO.BCM)
 
-STBY = 27
 
+# --- TB6612FNG ----
+STBY = 27
 PWMA = 18
 AIN1 = 14
 AIN2 = 15
-
 PWMB = 19
 BIN1 = 23
 BIN2 = 24
-
 
 GPIO.setup(STBY, GPIO.OUT)
 GPIO.setup(PWMA, GPIO.OUT)
@@ -25,6 +24,22 @@ GPIO.setup(BIN2, GPIO.OUT)
 
 pwma = GPIO.PWM(PWMA, 300)
 pwmb = GPIO.PWM(PWMB, 300)
+# ----------------
+
+# --- SG90s ---
+
+# vertical axis Y
+VER = 25
+# horizontal axis X
+HOR = 17
+
+GPIO.setup(VER, GPIO.OUT)
+GPIO.setup(HOR, GPIO.OUT)
+# ----------------
+
+
+
+
 
 # 前进或后退（大于0前进，小于0后退）
 def goForward(speed):
@@ -45,6 +60,43 @@ def goForward(speed):
         pwmb.start(-speed)
         sleep(0.02)
 
+def changeDirection(speed):
+    if (speed > 0):
+        GPIO.output(AIN1, GPIO.HIGH)
+        GPIO.output(AIN2, GPIO.LOW)
+        GPIO.output(BIN1, GPIO.LOW)
+        GPIO.output(BIN2, GPIO.HIGH)
+        pwma.start(speed)
+        pwmb.start(speed)
+        sleep(0.02)
+    else:
+        GPIO.output(AIN1, GPIO.LOW)
+        GPIO.output(AIN2, GPIO.HIGH)
+        GPIO.output(BIN1, GPIO.HIGH)
+        GPIO.output(BIN2, GPIO.LOW)
+        pwma.start(speed)
+        pwmb.start(speed)
+        sleep(0.02)
+
+def setServoAngle(servo, angle):
+    assert angle >= 30 and angle <= 150
+    pwm = GPIO.PWM(servo, 50)
+    pwm.start(8)
+    dutyCycle = angle / 18. + 3.
+    pwm.ChangeDutyCycle(dutyCycle)
+    sleep(0.02)
+    pwm.stop()
+
+# viewpoint rotation Y
+def verAngle(angle):
+    setServoAngle(VER, angle)
+
+# vierpoint rotation X
+def horAngle(angle):
+    setServoAngle(HOR, angle)
+
+    
+
 # 停止工作
 def stop():
     pwma.stop()
@@ -53,9 +105,6 @@ def stop():
     GPIO.output(AIN2, GPIO.LOW)
     GPIO.output(BIN1, GPIO.LOW)
     GPIO.output(BIN2, GPIO.LOW)
-
-def testForward():
-    goForward(100)
 
 
 

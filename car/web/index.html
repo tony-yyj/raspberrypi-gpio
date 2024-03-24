@@ -1,0 +1,64 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>WebSocket Client Example</title>  
+    <style>
+        .camera{
+            width: 300px;
+            height: 300px;
+            position: relative;
+            background: #000000;
+        }
+        .camera button{
+            display: block;
+            width: 100px;
+        }
+        .camera .left{
+            position: absolute;
+            top: 50%;
+            left: 0;
+        }
+        .camera .right{
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translateX(-100%);
+        }
+        .camera .up{
+            position: absolute;
+            top: 0;
+            left:50%;
+            transform: translateX(-50%);
+        }
+        .camera .down{
+            position: absolute;
+            top: 100%;
+            left:50%;
+            transform: translateY(-100%) translateX(-50%);
+        }
+    </style>
+</head>  
+
+<body>  
+    <h1>WebSocket Client</h1>  
+    <button onclick="sendJsonMessage()">Send JSON Message</button>  
+
+    <div>
+    <h2>摄像头</h2>
+    <div class="camera">
+    <button  class="left" onclick="cameraRotate('left')">水平向左</button>
+    <button class="right" onclick="cameraRotate('right')">水平向右</button>
+    <button class="up" onclick="cameraRotate('up')">垂直向上</button>
+    <button class="down" onclick="cameraRotate('down')">垂直向下</button>
+    </div>
+    </div>
+
+
+    <p>Messages:</p>  
+    <ul id="messages"></ul>  
+  
+  <script src="./index.js">    </script>
+</body>  
+</html>
