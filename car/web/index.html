@@ -38,6 +38,57 @@
             left:50%;
             transform: translateY(-100%) translateX(-50%);
         }
+        
+        .wheel{
+            width: 300px;
+            height: 300px;
+            position: relative;
+            background: #000000;
+        }
+        .wheel button{
+            display: block;
+            width: 100px;
+        }
+        .wheel .left{
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 80px;
+
+        
+        }
+        .wheel .right{
+            position: absolute;
+            top: 50%;
+            left: 100px;
+            width: 80px;
+
+        }
+        .wheel .front{
+
+            position: absolute;
+            right: 0;
+            transform: translateY(-150%);
+            top: 50%
+
+        }
+        .wheel .back{
+            position: absolute;
+            right: 0;
+            transform: translateY(150%);
+            top: 50%
+
+        }
+
+        .wheel .stop{
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+
+        
+        }
     </style>
 </head>  
 
@@ -46,7 +97,9 @@
     <button onclick="sendJsonMessage()">Send JSON Message</button>  
 
     <div>
+    
     <h2>摄像头</h2>
+    <img src="http://192.168.0.111:8000/stream.mjpg" width="400px" height="380px"/>
     <div class="camera">
     <button  class="left" onclick="cameraRotate('left')">水平向左</button>
     <button class="right" onclick="cameraRotate('right')">水平向右</button>
@@ -55,6 +108,16 @@
     </div>
     </div>
 
+    <div>
+    <h2>车轮</h2>
+    <div class="wheel">
+    <button  class="left" onclick="wheelDirection('left')">左转</button>
+    <button class="right" onclick="wheelDirection('right')">右转</button>
+    <button class="front" onclick="wheelDirection('front')">前进</button>
+    <button class="back" onclick="wheelDirection('back')">后退</button>
+    <button class="stop" onclick="wheelDirection('stop')">停止</button>
+    </div>
+    </div>
 
     <p>Messages:</p>  
     <ul id="messages"></ul>  

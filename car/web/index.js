@@ -65,3 +65,23 @@ function cameraRotate(direction) {
     }
 
 }
+
+function wheelDirection(direction) {
+    if (socket.readyState === WebSocket.OPEN) {
+        // 创建一个JSON对象  
+        var jsonData = {
+            topic: 'wheel',
+            direction, 
+        };
+
+        // 将JSON对象转换为字符串  
+        var jsonString = JSON.stringify(jsonData);
+
+        // 发送JSON字符串给服务器  
+        socket.send(jsonString);
+        console.log('JSON message sent to server:', jsonData);
+    } else {
+        console.log('WebSocket is not open. Unable to send message.');
+    }
+
+}

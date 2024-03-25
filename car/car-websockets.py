@@ -7,6 +7,8 @@ import signal
 import RPi.GPIO as GPIO
 from time import sleep
 
+GPIO.setwarnings(False)
+
 global_verAngle = 75
 global_horAngle = 75
 
@@ -83,8 +85,8 @@ def changeDirection(speed):
         GPIO.output(AIN2, GPIO.HIGH)
         GPIO.output(BIN1, GPIO.HIGH)
         GPIO.output(BIN2, GPIO.LOW)
-        pwma.start(speed)
-        pwmb.start(speed)
+        pwma.start(-speed)
+        pwmb.start(-speed)
         sleep(0.02)
 
 def setServoAngle(servo, angle):
@@ -117,7 +119,7 @@ def stop():
 
 logging.basicConfig(level=logging.DEBUG)  # 设置日志级别为DEBUG  
 
-
+global_speed = 30
   
 async def echo(websocket, path):  
     try:  
@@ -160,9 +162,31 @@ async def echo(websocket, path):
                 else:
                     pass
 
+            if data['topic'] == 'wheel':
+                global global_speed
+                if data['direction'] == 'front':
+                    global_speed = 30
+                    goForward(global_speed)
+                elif data['direction'] == 'back':
+                    global_speed = -30
+                    goForward(global_speed)
+                elif data['direction'] == 'left':
+                    changeDirection(20)
+                elif data['direction'] == 'right':
+                    changeDirection(-20)
+                elif data['direction'] == 'stop': 
+                    stop()
+                else:
+                    pass
+
+                response = json.dumps({'message': 'received', 'global_speed':global_speed})
+                await websocket.send(response)
+
+
     except json.JSONDecodeError:
         await websocket.send(json.dumps({'error', 'invalid JSON format'}))
     except websockets.exceptions.ConnectionClosed as e:  
+        stop()
         logging.warning(f"WebSocket connection closed: {e}")  
     except Exception as e:  
         logging.error(f"An error occurred: {e}")  
