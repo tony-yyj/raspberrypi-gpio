@@ -141,6 +141,11 @@ var decelerateInterval;
 const frontButton = document.getElementById('front');
 const  backButton = document.getElementById('back');
 
+// 加速
+function accelerate() {
+
+}
+
 frontButton.addEventListener('mousedown', () => {
     isMoving = true;
     acceleration = 10;

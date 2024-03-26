@@ -1,4 +1,6 @@
 from time import sleep
+from gpio_pin import GPIOPIN
+import RPi.GPIO as GPIO
 
 # sg90s 舵机
 class ServoMotor:
@@ -33,6 +35,44 @@ class ServoMotor:
         sleep(0.1)
 
 
+class CameraServoMotor:
+
+    @staticmethod
+    def accAngle(preAngle, increment):
+        angle = preAngle + increment
+        if angle > 180:
+            return 180
+        elif angle < 0:
+            return 0
+        else:
+            return angle
+
+    def __init__(self) -> None:
+        self.__verAngle = 75
+        self.__horAngle = 75
+        GPIO.setup(GPIOPIN.HOR_SERVO_PIN(), GPIO.OUT)
+        GPIO.setup(GPIOPIN.VER_SERVO_PIN(), GPIO.OUT)
+        pwmVer = GPIO.PWM(GPIOPIN.VER_SERVO_PIN(), 50)
+        pwmHor = GPIO.PWM(GPIOPIN.HOR_SERVO_PIN(), 50)
+        self.__horMotor= ServoMotor(pwmHor)
+        self.__verMotor= ServoMotor(pwmVer)
+        self.__horMotor.setServoAngle(self.__horAngle)
+        self.__verMotor.setServoAngle(self.__verAngle)
+    
+    def moveVerMotorDown(self):
+        self.__verAngle = CameraServoMotor.accAngle(self.__verAngle, 10)
+        self.__verMotor.setServoAngle(self.__verAngle)
+        
+    def moveVerMotorUp(self):
+        self.__verAngle = CameraServoMotor.accAngle(self.__verAngle, - 10)
+        self.__verMotor.setServoAngle(self.__verAngle)
 
 
+    def moveHorMotorLeft(self):
+        self.__horAngle = CameraServoMotor.accAngle(self.__horAngle, + 10)
+        self.__horMotor.setServoAngle(self.__horAngle)
+
+    def moveHorMotorRight(self):
+        self.__horAngle = CameraServoMotor.accAngle(self.__horAngle, - 10)
+        self.__horMotor.setServoAngle(self.__horAngle)
 
