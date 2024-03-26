@@ -7,7 +7,7 @@ class ServoMotor:
         self.pwm.start(0)
 
     def __delattr__(self) -> None:
-        self.pwm.stop(0)
+        pass
 
 
     @staticmethod
@@ -28,7 +28,7 @@ class ServoMotor:
         dutyCycle = ServoMotor.angleToDujtyCycle(angle) 
         print(f"duty cycle: {dutyCycle}")
         self.pwm.ChangeDutyCycle(dutyCycle)
-        sleep(0.3)
+        sleep(0.1)
         self.pwm.ChangeDutyCycle(0)
         sleep(0.1)
 
