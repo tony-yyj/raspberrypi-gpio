@@ -72,14 +72,15 @@ function cameraRotate(direction) {
         console.log('WebSocket is not open. Unable to send message.');
     }
 
+
 }
 
-function sendForwardMsg(speed) {
+function sendCarMoveMsg(direction, speed) {
     if (socket.readyState === WebSocket.OPEN) {
         // 创建一个JSON对象  
         var jsonData = {
             topic: 'wheel',
-            direction: 'front',
+            direction,
             speed,
         };
 
@@ -90,135 +91,66 @@ function sendForwardMsg(speed) {
         socket.send(jsonString);
         console.log('JSON message sent to server:', jsonData);
     } else {
-        console.log('WebSocket is not open. Unable to send message.');
-    }
-
-}
-
-function sendBackMsg(speed) {
-    if (socket.readyState === WebSocket.OPEN) {
-        // 创建一个JSON对象  
-        var jsonData = {
-            topic: 'wheel',
-            direction: 'back',
-            speed,
-        };
-
-        // 将JSON对象转换为字符串  
-        var jsonString = JSON.stringify(jsonData);
-
-        // 发送JSON字符串给服务器  
-        socket.send(jsonString);
-        console.log('JSON message sent to server:', jsonData);
-    } else {
-        console.log('WebSocket is not open. Unable to send message.');
-    }
-
-}
-
-function sendStopMsg() {
-    if (socket.readyState === WebSocket.OPEN) {
-        // 创建一个JSON对象  
-        var jsonData = {
-            topic: 'wheel',
-            direction: 'stop',
-            speed: 0,
-        };
-
-        // 将JSON对象转换为字符串  
-        var jsonString = JSON.stringify(jsonData);
-
-        // 发送JSON字符串给服务器  
-        socket.send(jsonString);
-        console.log('JSON message sent to server:', jsonData);
-    } else {
-        console.log('WebSocket is not open. Unable to send message.');
+        console.log('WebSocket is not open. Unable to send message.', direction, speed);
     }
 }
+
 
 var accelerationInterval;
 var decelerateInterval;
 const frontButton = document.getElementById('front');
-const  backButton = document.getElementById('back');
+const backButton = document.getElementById('back');
+
+var speed = 0;
 
 // 加速
-function accelerate() {
+function accelerate(direction) {
+    isMoving = true;
+    if (decelerateInterval) {
+        window.clearInterval(decelerateInterval);
+    }
+    accelerationInterval = window.setInterval(() => {
+        if (speed < MAX_SPEED) {
+            speed += RATE;
+        }
+        sendCarMoveMsg(direction, speed);
+    }, 200)
+}
+
+// 减速
+function slowDown(direction) {
+    console.log('-- mouse up', direction);
+
+    if (accelerationInterval) {
+        window.clearInterval(accelerationInterval);
+    }
+
+    decelerateInterval = window.setInterval(() => {
+
+        speed = speed - RATE;
+        if (speed > 0) {
+            sendCarMoveMsg(direction, speed)
+        } else {
+            if (decelerateInterval) {
+                window.clearInterval(decelerateInterval)
+            }
+            isMoving = false;
+            speed = 0;
+            stop();
+
+        }
+    }, 200)
 
 }
 
-frontButton.addEventListener('mousedown', () => {
-    isMoving = true;
-    acceleration = 10;
-    accelerationInterval = window.setInterval(() => {
-        if (acceleration < MAX_SPEED) {
-            acceleration += RATE;
-        }
-        sendForwardMsg(acceleration);
-
-    }, 200)
-
-    const decelerateAndStop = () => {
-        if (accelerationInterval) {
-            window.clearInterval(accelerationInterval);
-        }
-        decelerateInterval = window.setInterval(() => {
-            if (acceleration > 0 && acceleration) {
-                acceleration -= RATE;
-
-                sendForwardMsg(acceleration)
-            } else {
-                if (decelerateInterval) {
-                    window.clearInterval(decelerateInterval)
-                }
-                isMoving = false;
-                sendStopMsg();
-
-            }
-        }, 200)
-    }
-    frontButton.addEventListener('mouseup', decelerateAndStop, { once: true });
 
 
-})
-
-backButton.addEventListener('mousedown', () => {
-    isMoving = true;
-    acceleration = 10;
-    accelerationInterval = window.setInterval(() => {
-        if (acceleration < MAX_SPEED) {
-            acceleration += RATE;
-        }
-        sendBackMsg(acceleration);
-
-    }, 200)
-
-    const decelerateAndStop = () => {
-        if (accelerationInterval) {
-            window.clearInterval(accelerationInterval);
-        }
-        decelerateInterval = window.setInterval(() => {
-            if (acceleration > 0 && acceleration) {
-                acceleration -= RATE;
-
-                sendBackMsg(acceleration)
-            } else {
-                if (decelerateInterval) {
-                    window.clearInterval(decelerateInterval)
-                }
-                isMoving = false;
-                sendStopMsg();
-
-            }
-        }, 200)
-    }
-    backButton.addEventListener('mouseup', decelerateAndStop, { once: true });
 
 
-})
 
 function stop() {
     isMoving = false;
-    acceleration = 0;
+    speed= 0;
     console.log(' -- stop');
     if (accelerationInterval) {
         window.clearInterval(accelerationInterval);
@@ -227,6 +159,117 @@ function stop() {
     if (decelerateInterval) {
         window.clearInterval(decelerateInterval)
     }
-    sendStopMsg();
+    sendCarMoveMsg('stop', 0);
 
+}
+var leftEl = document.getElementById('left');
+var rightEl = document.getElementById('right')
+
+const mql = window.matchMedia("(max-width:600px)");
+console.log('Max width 6000px: ', mql);
+if (mql.matches) {
+    // mweb
+
+
+
+    frontButton.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // 阻止默认行为  
+
+        console.log('touch start');
+        accelerate('front');
+        frontButton.addEventListener('touchend',
+            (e) => {
+                e.preventDefault();
+
+                slowDown('front')
+            },
+            { once: true });
+    })
+
+    backButton.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        accelerate('back');
+        backButton.addEventListener('touchend', (e) => {
+
+            e.preventDefault();
+            slowDown('back')
+        }, { once: true });
+    })
+
+    leftEl.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        stop();
+
+        const time = window.setInterval(() => {
+
+            sendCarMoveMsg('left', 30)
+        }, 200)
+
+        leftEl.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            clearInterval(time);
+            stop();
+
+        }, { once: true })
+
+    })
+
+    rightEl.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        stop();
+
+        const time = window.setInterval(() => {
+
+            sendCarMoveMsg('right', 30)
+        }, 200)
+
+        rightEl.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            clearInterval(time);
+            stop();
+
+        }, { once: true })
+    })
+
+} else {
+    frontButton.addEventListener('mousedown', () => {
+        accelerate('front');
+        frontButton.addEventListener('mouseup', () => slowDown('front'), { once: true });
+    })
+
+    backButton.addEventListener('mousedown', () => {
+        accelerate('back');
+        backButton.addEventListener('mouseup', () => slowDown('back'), { once: true });
+    })
+
+    leftEl.addEventListener('mousedown', () => {
+        stop();
+
+        const time = window.setInterval(() => {
+
+            sendCarMoveMsg('left', 30)
+        }, 200)
+
+        leftEl.addEventListener('mouseup', () => {
+            clearInterval(time);
+            stop();
+
+        }, { once: true })
+
+    })
+
+    rightEl.addEventListener('mousedown', () => {
+        stop();
+
+        const time = window.setInterval(() => {
+
+            sendCarMoveMsg('right', 30)
+        }, 200)
+
+        rightEl.addEventListener('mouseup', () => {
+            clearInterval(time);
+            stop();
+
+        }, { once: true })
+    })
 }

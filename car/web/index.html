@@ -1,127 +1,149 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>WebSocket Client Example</title>  
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client Example</title>
     <style>
-        .camera{
+        .camera {
             width: 300px;
             height: 300px;
             position: relative;
             background: #000000;
         }
-        .camera button{
+
+        .camera button {
             display: block;
             width: 100px;
+            z-index: 10;
         }
-        .camera .left{
+
+        .camera .left {
             position: absolute;
             top: 50%;
             left: 0;
         }
-        .camera .right{
+
+        .camera .right {
             position: absolute;
             top: 50%;
             left: 100%;
             transform: translateX(-100%);
         }
-        .camera .up{
+
+        .camera .up {
             position: absolute;
             top: 0;
-            left:50%;
+            left: 50%;
             transform: translateX(-50%);
         }
-        .camera .down{
+
+        .camera .down {
             position: absolute;
             top: 100%;
-            left:50%;
+            left: 50%;
             transform: translateY(-100%) translateX(-50%);
         }
-        
-        .wheel{
-            width: 300px;
-            height: 300px;
+
+        .wheel {
+            width: 350px;
+            height: 350px;
             position: relative;
             background: #000000;
         }
-        .wheel button{
+
+        .wheel button {
             display: block;
             width: 100px;
+            -webkit-user-select: none;
+            /* Safari */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* IE10+/Edge */
+            user-select: none;
+            /* Standard syntax */
+            z-index: 10;
+            height: 50px;
+            border-radius: 20%;
         }
-        .wheel .left{
+
+        .wheel .left {
             position: absolute;
             top: 50%;
             left: 0;
             width: 80px;
 
-        
+
         }
-        .wheel .right{
+
+        .wheel .right {
             position: absolute;
             top: 50%;
             left: 100px;
             width: 80px;
 
         }
-        .wheel .front{
+
+        .wheel .front {
 
             position: absolute;
             right: 0;
             transform: translateY(-150%);
             top: 50%
-
         }
-        .wheel .back{
+
+        .wheel .back {
             position: absolute;
             right: 0;
             transform: translateY(150%);
             top: 50%
-
         }
 
-        .wheel .stop{
+        .wheel .stop {
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
             width: 80px;
 
-        
+
         }
     </style>
-</head>  
+</head>
 
-<body>  
-    <h1>WebSocket Client</h1>  
-    <button onclick="sendJsonMessage()">Send JSON Message</button>  
-
-    <div>
-    
-    <h2>摄像头</h2>
-    <img src="http://192.168.0.111:8000/stream.mjpg" width="400px" height="380px"/>
-    <div class="camera">
-    <button  class="left" onclick="cameraRotate('left')">水平向左</button>
-    <button class="right" onclick="cameraRotate('right')">水平向右</button>
-    <button class="up" onclick="cameraRotate('up')">垂直向上</button>
-    <button class="down" onclick="cameraRotate('down')">垂直向下</button>
-    </div>
-    </div>
+<body>
+    <h1>WebSocket Client</h1>
+    <button onclick="sendJsonMessage()">Send JSON Message</button>
 
     <div>
-    <h2>车轮</h2>
-    <div class="wheel">
-    <button  class="left" onclick="wheelDirection('left')">左转</button>
-    <button class="right" onclick="wheelDirection('right')">右转</button>
-    <button class="front" id="front">前进</button>
-    <button class="back" id="back">后退</button>
-    <button class="stop" id="stop" onclick="stop()">停止</button>
+        <h2>车轮</h2>
+        <div class="wheel">
+            <button class="left" id="left">左转</button>
+            <button class="right" id="right">右转</button>
+            <button class="front" id="front">前进</button>
+            <button class="back" id="back">后退</button>
+            <button class="stop" id="stop" onclick="stop()">停止</button>
+        </div>
     </div>
+    <div>
+
+        <h2>摄像头</h2>
+        <img src="http://192.168.0.111:8000/stream.mjpg" width="350px" height="350px" />
+        <div class="camera">
+            <button class="left" onclick="cameraRotate('left')">水平向左</button>
+            <button class="right" onclick="cameraRotate('right')">水平向右</button>
+            <button class="up" onclick="cameraRotate('up')">垂直向上</button>
+            <button class="down" onclick="cameraRotate('down')">垂直向下</button>
+        </div>
     </div>
 
-    <p>Messages:</p>  
-    <ul id="messages"></ul>  
-  
-  <script src="./index.js">    </script>
-</body>  
+
+    <p>Messages:</p>
+    <ul id="messages"></ul>
+
+    <script src="./index.js">    </script>
+</body>
+
 </html>

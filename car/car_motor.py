@@ -39,11 +39,11 @@ class CarMotor:
     
     def turnLeft(self, speed):
         # 左侧speed减半实现左转
-        GPIO.output(GPIOPIN.AIN1(), GPIO.LOW)
-        GPIO.output(GPIOPIN.AIN2(), GPIO.HIGH)
+        GPIO.output(GPIOPIN.AIN1(), GPIO.HIGH)
+        GPIO.output(GPIOPIN.AIN2(), GPIO.LOW)
         GPIO.output(GPIOPIN.BIN1(), GPIO.LOW)
         GPIO.output(GPIOPIN.BIN2(), GPIO.HIGH)
-        self.pwmLeft.start(speed / 2)
+        self.pwmLeft.start(speed)
         self.pwmRight.start(speed)
         sleep(0.02) 
 
@@ -51,8 +51,8 @@ class CarMotor:
         # 右侧侧speed减半实现右转
         GPIO.output(GPIOPIN.AIN1(), GPIO.LOW)
         GPIO.output(GPIOPIN.AIN2(), GPIO.HIGH)
-        GPIO.output(GPIOPIN.BIN1(), GPIO.LOW)
-        GPIO.output(GPIOPIN.BIN2(), GPIO.HIGH)
+        GPIO.output(GPIOPIN.BIN1(), GPIO.HIGH)
+        GPIO.output(GPIOPIN.BIN2(), GPIO.LOW)
         self.pwmLeft.start(speed)
         self.pwmRight.start(speed / 2)
         sleep(0.02) 
