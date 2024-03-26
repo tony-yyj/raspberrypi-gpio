@@ -1,5 +1,6 @@
 from time import sleep
 import RPi.GPIO as GPIO
+from servo_motor import ServoMotor
 
 GPIO.setmode(GPIO.BCM)
 
@@ -8,31 +9,12 @@ VER= 25
 
 GPIO.setup(VER, GPIO.OUT)
 pwm = GPIO.PWM(VER, 50)
-pwm.start(0)
 
-def angleToDujtyCycle(num):
-    fm = 10.0 / 180.0
-    num = num * fm + 2.5
-    num = int(num * 10) / 10.0
-    return num
 
-def setServoAngle(servo, angle):
-    global pwm
-    assert angle >= 0 and angle <= 180
-    currentlyAngle = 180 - angle
-    dutyCycle = angleToDujtyCycle(currentlyAngle)
-    
-    print(dutyCycle)
-    pwm.ChangeDutyCycle(dutyCycle)
-    sleep(0.3)
-    pwm.ChangeDutyCycle(0)
-    sleep(0.1)
-
-def stop():
-    pwm.stop()
 
 if __name__ == "__main__":
     try:
+        verServoMotor = ServoMotor(pwm)
         while(True):
             try:
 
@@ -45,7 +27,7 @@ if __name__ == "__main__":
                 else:
                     angle = int(option)
 
-                setServoAngle(VER, angle)
+                verServoMotor.setServoAngle(angle)
            
             except ValueError:
                 print('请输入正确的数字')
@@ -54,7 +36,7 @@ if __name__ == "__main__":
 
 
     except KeyboardInterrupt:
-        stop()
+        del verServoMotor
         GPIO.cleanup()
 
 
