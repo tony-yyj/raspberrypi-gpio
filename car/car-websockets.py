@@ -129,7 +129,7 @@ async def echo(websocket, path):
             logging.debug(f"Received message: {message}")  
             data = json.loads(message)
             if data['topic'] == 'camera':
-                if data['direction'] == 'right':
+                if data['direction'] == 'left':
                     global_horAngle= global_horAngle+ 10
                     if (global_horAngle>= 150):
                         global_horAngle= 150
@@ -137,7 +137,7 @@ async def echo(websocket, path):
                     response = json.dumps({'message': 'received', 'hor_angle':global_horAngle})
                     await websocket.send(response)
 
-                elif data['direction'] == 'left':
+                elif data['direction'] == 'right':
                     global_horAngle= global_horAngle - 10
                     if (global_horAngle <= 30):
                         global_horAngle= 30
@@ -163,23 +163,25 @@ async def echo(websocket, path):
                     pass
 
             if data['topic'] == 'wheel':
-                global global_speed
+                data_speed = int(data['speed'])
                 if data['direction'] == 'front':
-                    global_speed = 30
-                    goForward(global_speed)
+                    speed = data_speed
+                    goForward(speed)
                 elif data['direction'] == 'back':
-                    global_speed = -30
-                    goForward(global_speed)
+                    speed = 0 - data_speed
+                    goForward(speed)
                 elif data['direction'] == 'left':
-                    changeDirection(20)
+                    speed = data_speed
+                    changeDirection(speed)
                 elif data['direction'] == 'right':
-                    changeDirection(-20)
+                    speed = 0 - data_speed
+                    changeDirection(speed)
                 elif data['direction'] == 'stop': 
                     stop()
                 else:
                     pass
 
-                response = json.dumps({'message': 'received', 'global_speed':global_speed})
+                response = json.dumps({'message': 'received', 'global_speed':data_speed})
                 await websocket.send(response)
 
 
@@ -222,4 +224,7 @@ try:
 except KeyboardInterrupt:  
     pass  
 finally:  
+    stop()
+    print('shut down car')
+    GPIO.cleanup()
     loop.close()
