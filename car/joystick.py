@@ -3,13 +3,10 @@ import pygame
 import logging  
 import sys  
 from prettytable import PrettyTable
-import RPi.GPIO as GPIO
-from car_motor import CarMotor
+from car_control import CarControl
 
 logging.basicConfig(level=logging.DEBUG)  # 设置日志级别为DEBUG  
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
 
 # 初始化pygame的joystick模块  
 pygame.init()  
@@ -28,13 +25,15 @@ joystick.init()
 joystick_name = joystick.get_name()
 print(f"joystick_name: {joystick_name}")
 
-carMotor = CarMotor()
+carControl = CarControl()
 
   
 running = True
 if __name__ == "__main__":
 
     try:
+
+        direction = 'forward'
         while(running):
             try:
                 for event in pygame.event.get():  
@@ -43,35 +42,39 @@ if __name__ == "__main__":
             
                 table =PrettyTable()
 
-                direction = 'forward'
+                stopButton = joystick.get_button(0)
+                if (stopButton == 1):
+                    carControl.stop()
+                    continue
+
+
                 directionLeftRight = joystick.get_axis(0)
                 if directionLeftRight > 0.5:
-                    direction = 'right'
+                    carControl.turn_right()
                 elif directionLeftRight < -0.5:
-                    direction = 'left'
+                    carControl.turn_left()
+                    pass
                 else:
+                    carControl.straight_ahead()
                     pass
 
                 directionForward = joystick.get_axis(1)
                 if directionForward < -0.5:
-                    direction = 'forward'
+                    carControl.move_forward()
                 elif directionForward > 0.5:
-                    direction = 'back'
+                    carControl.move_backword()
                 else:
                     pass
 
 
                 speedButton = joystick.get_button(1)
                 if speedButton == 1:
-                    carMotor.accelerate(direction)
+                    carControl.change_speed()
                 else:
-                    carMotor.accelerate(direction, True)
+                    carControl.change_speed(True)
 
 
-                stopButton = joystick.get_button(0)
-                if (stopButton == 1):
-                    carMotor.stop()
-
+             
                 sleep(0.1)
 
             except ValueError:
