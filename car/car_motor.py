@@ -17,47 +17,64 @@ class CarMotor:
         GPIO.output(GPIOPIN.STBY(), GPIO.HIGH)
         self.pwmLeft = GPIO.PWM(GPIOPIN.PWMA(), 300)
         self.pwmRight = GPIO.PWM(GPIOPIN.PWMB(), 300)
+        self.speed = 0
+        self.DIRECTIAN = {
+            'forward': self.forwoard,
+            'back': self.back,
+            'left': self.turnLeft,
+            'right': self.turnRight,
+        }
+    
+    def accelerate(self, direction, dec = False):
+        self.speed = self.speed + (-1 if dec else 1 )
+        if self.speed > 100:
+            self.speed = 99
+        elif self.speed < 0:
+            self.speed = 0
 
-    def forwoard(self, speed):
+        for _direction in self.DIRECTIAN:
+            if _direction == direction:
+                handle = self.DIRECTIAN[_direction]
+                handle()
+                return
+        
+    def getSpeed(self):
+        return self.speed
+
+
+    def forwoard(self):
         GPIO.output(GPIOPIN.AIN1(), GPIO.LOW)
         GPIO.output(GPIOPIN.AIN2(), GPIO.HIGH)
         GPIO.output(GPIOPIN.BIN1(), GPIO.LOW)
         GPIO.output(GPIOPIN.BIN2(), GPIO.HIGH)
-        print(f'speed:{speed}')
-        self.pwmLeft.start(speed)
-        self.pwmRight.start(speed)
-        sleep(0.02)
+        self.pwmLeft.start(self.speed)
+        self.pwmRight.start(self.speed)
+        sleep(0.001)
     
-    def back(self, speed):
+    def back(self):
         GPIO.output(GPIOPIN.AIN1(), GPIO.HIGH)
         GPIO.output(GPIOPIN.AIN2(), GPIO.LOW)
         GPIO.output(GPIOPIN.BIN1(), GPIO.HIGH)
         GPIO.output(GPIOPIN.BIN2(), GPIO.LOW)
-        self.pwmLeft.start(speed)
-        self.pwmRight.start(speed)
-        sleep(0.02)
+        self.pwmLeft.start(self.speed)
+        self.pwmRight.start(self.speed)
+        sleep(0.001)
     
-    def turnLeft(self, speed):
+    def turnLeft(self):
         # 左侧speed减半实现左转
-        GPIO.output(GPIOPIN.AIN1(), GPIO.HIGH)
-        GPIO.output(GPIOPIN.AIN2(), GPIO.LOW)
-        GPIO.output(GPIOPIN.BIN1(), GPIO.LOW)
-        GPIO.output(GPIOPIN.BIN2(), GPIO.HIGH)
-        self.pwmLeft.start(speed)
-        self.pwmRight.start(speed)
-        sleep(0.02) 
+        self.pwmLeft.start(self.speed / 2)
+        self.pwmRight.start(self.speed)
+        sleep(0.001) 
 
-    def turnRight(self, speed):
+    def turnRight(self):
         # 右侧侧speed减半实现右转
-        GPIO.output(GPIOPIN.AIN1(), GPIO.LOW)
-        GPIO.output(GPIOPIN.AIN2(), GPIO.HIGH)
-        GPIO.output(GPIOPIN.BIN1(), GPIO.HIGH)
-        GPIO.output(GPIOPIN.BIN2(), GPIO.LOW)
-        self.pwmLeft.start(speed)
-        self.pwmRight.start(speed / 2)
-        sleep(0.02) 
+        self.pwmLeft.start(self.speed)
+        self.pwmRight.start(self.speed / 2)
+        sleep(0.001) 
     
     def stop(self):
+        self.speed = 0
+        self.direction = 'forward'
         self.pwmLeft.stop()
         self.pwmRight.stop()
         GPIO.output(GPIOPIN.AIN1(), GPIO.LOW)

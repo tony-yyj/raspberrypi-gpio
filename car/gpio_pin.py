@@ -6,10 +6,10 @@ class GPIOPIN:
         return 27
     @staticmethod
     def AIN1():
-        return 14
+        return 16
     @staticmethod
     def AIN2():
-        return 15
+        return 20 
     @staticmethod
     def PWMA():
         return 18
